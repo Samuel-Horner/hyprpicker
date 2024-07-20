@@ -8,10 +8,11 @@ import os
 import argparse
 import kb_input
 import fzf_wrapper
+import subprocess
 
 wallpapers = []
 # Defaults
-preview = "kitten icat --use-window-size 200,200,2000,2000"
+preview = "kitten icat --use-window-size 1,1,"
 dir = "~/pics/wallpapers"
 
 def print_wallpapers(choice):
@@ -60,6 +61,7 @@ def main(quit_on_set):
     os.system("clear")
 
 if __name__ == "__main__":
+
     parser = argparse.ArgumentParser()
     parser.add_argument("-p", "--preview", type= str, help = f"Command that is run to preview the image, defaults to '{preview} $FILE'")
     parser.add_argument("-q", "--quit-on-set", help = "Quits the program when setting a wallpaper.", action = "store_true")
@@ -67,7 +69,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.directory: dir = args.directory
-    if args.preview: preview = args.preview 
+    if args.preview: preview = args.preview
+    else:
+        command = ["kitty", "+kitten", "icat", "--print-window-size"] # Gets window size and sets preview width / height to 0.75 * each dim 
+        width, height = tuple(map(lambda x: int(x), subprocess.run(command, capture_output=True, text=True).stdout.strip().split("x")))
+        preview += f"{int(width * 0.75)},{int(height * 0.75)}"
 
     wallpapers = os.listdir(os.path.expanduser(dir)) # Gets wallpapers
     if len(wallpapers) == 0:
