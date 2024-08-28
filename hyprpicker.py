@@ -22,12 +22,18 @@ def print_wallpapers(choice):
     print("h/a - left, l/d - right, f - fuzzy, s/enter - set, q - quit")
     os.system(f"{preview} {dir}/{wallpapers[choice]}")
 
-def set_wallpaper(choice):
+def set_wallpaper(choice, backend):
     paper = f"{dir}/{wallpapers[choice]}"
     print(f"Setting wallpaper to {paper}")
-    os.system("hyprctl hyprpaper unload all")
-    os.system(f"hyprctl hyprpaper preload \"{paper}\"")
-    os.system(f"hyprctl hyprpaper wallpaper \", {paper}\"")
+    match backend:
+        case "hyprpaper":
+            os.system("hyprctl hyprpaper unload all")
+            os.system(f"hyprctl hyprpaper preload \"{paper}\"")
+            os.system(f"hyprctl hyprpaper wallpaper \", {paper}\"")
+        case "swww":
+            os.system(f"swww img {paper}")
+        case _:
+            print(f"Invalid backend {backend}")
 
 def fuzzy_get_wallpaper(choice):
     fzf = fzf_wrapper.FzfPrompt()
@@ -36,7 +42,7 @@ def fuzzy_get_wallpaper(choice):
     choice = wallpapers.index(res[0])
     return choice
 
-def main(quit_on_set):
+def main(quit_on_set, backend):
     kb = kb_input.KBHit()
     choice = 0
     print_wallpapers(choice)
@@ -53,7 +59,7 @@ def main(quit_on_set):
                 choice = fuzzy_get_wallpaper(choice)
                 print_wallpapers(choice)
             elif c == "s" or c == "\n":
-                set_wallpaper(choice)
+                set_wallpaper(choice, backend)
                 if quit_on_set: break
             elif c == "q":
                 break
@@ -66,6 +72,7 @@ if __name__ == "__main__":
     parser.add_argument("-p", "--preview", type= str, help = f"Command that is run to preview the image, defaults to '{preview} $FILE'")
     parser.add_argument("-q", "--quit-on-set", help = "Quits the program when setting a wallpaper.", action = "store_true")
     parser.add_argument("-d", "--directory", type = str, help = f"The directory that wallpapers are located in. Defaults to {dir}.")
+    parser.add_argument("backend", type = str, action = "store", help = "The wallpaper backend, currently either 'swww' or 'hyprpaper'")
     args = parser.parse_args()
 
     if args.directory: dir = args.directory
@@ -80,4 +87,4 @@ if __name__ == "__main__":
         print("No wallpapers found.")
         exit()
 
-    main(args.quit_on_set)
+    main(args.quit_on_set, args.backend)
