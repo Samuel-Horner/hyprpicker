@@ -3,13 +3,13 @@ A simple python cli to select wallpapers with hyprpaper.
 
 ### Usage
 ``` BASH
-python hyprpicker.py [-h] [-p PREVIEW] [-q] [-d DIRECTORY] [BACKEND swww / hyprpaper]
+python hyprpicker.py [BACKEND]... [OPTIONS]...
 ```
-### Options
-- Backend
+### Backend
 The wallpaper backend to pass the image to. Current options are:
     - `swww`
     - `hyprpaper`
+### Options
 - -p, --preview
 The command used to preview the image. The most basic example is:
 ``` BASH
